@@ -1,14 +1,28 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class ExcelToSQLScanner {
+public class Scanner implements ScannerI{
 	private String nullRegex = "'[\\s]*(null)[\\s]*'";
 	private String trimRegex = "'(([\\s]+[\\w]+[\\s]+)|([\\s]*[\\w]+[\\s]+)|([\\s]+[\\w]+[\\s]*))'";
 	private String oneToManyRegex = "'[\\s]*([\\w]|;|[\\s])+[\\s]*'";
-	
-	public ExcelToSQLScanner() {
+	private Map<String, TableI> tables;
+	/** Constructor which initialize the table list.
+	 * 
+	 */
+	public Scanner() {
+		tables = new HashMap<String, TableI>();
+	}
+	private void add(String dbName, String dbTableName, AttributeData attrData) {
+		TableI table = new Table();
+		if (!tables.containsKey(dbTableName)) {
+			tables.put(dbTableName, table);
+			table.setName(dbTableName);
+		}
+		tables.get(dbTableName).addAttribute(attrData);
 	}
 	private String replaceOneToMany(String query) {
 		Pattern pattern = Pattern.compile(this.oneToManyRegex);
@@ -50,10 +64,22 @@ public class ExcelToSQLScanner {
 		return this.replaceOneToMany(query);
 	}
 	/*public static void main(String[] args) {
-		ExcelToSQLScanner myScanner = new ExcelToSQLScanner();
+		Scanner myScanner = new Scanner();
 		//System.out.println(myScanner.beautifyQuery("insert '1  ','' ' 22', ', ' null',  3  ', '444', 'null'"));
 		//System.out.println(myScanner.replaceOneToMany("insert into transcription values(default, 3,  'E2Fa  ; E2fb;   rrt   ;   piuy');"));
 	}*/
-
-    
+	@Override
+	public void analyzeAttributeName(String attrName, String variableType) {
+		AttributeData attrData = new AttributeData(attrName, variableType);
+		this.add("Genome", "Main", attrData);
+	}
+	@Override
+	public void analyzeAttributeName(String attrName, String variableType, Boolean primaryKey) {
+		AttributeData attrData = new AttributeData(attrName, variableType, primaryKey);
+		this.add("Genome", "Main", attrData);
+	}
+	@Override
+	public Map<String, TableI> getTables() {
+		return new HashMap<String, TableI>(this.tables);
+	}
 }

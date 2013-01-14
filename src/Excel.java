@@ -1,9 +1,12 @@
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
@@ -12,27 +15,40 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.ss.usermodel.Cell;
 
-/**
- * This is a simple class to read BUTOC excel file to construct a 
- * MySQL DB create and insert commands. Some of the functions are
- * hard coded according to the BUTOC database
+/**@author Tremayne
+ *
  */
 public class Excel {
-	private static int queryCell[];
 	private static File expt, trans, tissue;
 	//BufferedWriter exptWriter = new BufferedWriter(new FileWriter(this.expt));
+	private FileInputStream fis;
+   private  HSSFWorkbook workbook;
+    private HSSFSheet sheet; //i.e first worksheet hardcoded
+	private ScannerI scanner;
+	private WriterI writer;
+    
 	
-	private static ExcelToSQLScanner xlsToSql;
-    public static void main(String[] args) {
-    	Excel.queryCell = new int[args.length -1];
-    	//populate the queryCell array 
-    	for (int i = 0; i < Excel.queryCell.length; i++) {
-    		Excel.queryCell[i] = args[i+1].toLowerCase().charAt(0) - 'a';
-    	}
-    	xlsToSql = new ExcelToSQLScanner();
-        //writeDataToExcelFile(fileName);
-    	
-        analyzeExcelFile(args[0]);
+	public static void main(String[] args) {
+    	Excel excel = new Excel(args[0]);
+    	Map<String, TableI> tables = excel.analyzeExcel();
+    	excel.writeCreateQuery("Main", tables);
+    }
+    public Excel (String fileName) {
+		try {
+			this.fis = new FileInputStream(fileName);
+			this.workbook = new HSSFWorkbook(fis);
+			this.sheet = workbook.getSheetAt(0);
+			scanner = new Scanner();
+			writer = new Writer();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    
+        //i.e first worksheet hardcoded
     }
     /**This function creates the insert files used to generate the database.
      * These files have hard coded file since we are interested in only 3 tables
@@ -61,16 +77,47 @@ public class Excel {
 			System.exit(0);
 		}
 	}
-   
+   /**We will write later
+    * 
+    * @param line
+    * @param file
+    * @param metaWriter
+    * @throws IOException
+    */
     private void writeToFile(String line, File file, BufferedWriter metaWriter) throws IOException {
 		metaWriter.write(line);
 		metaWriter.newLine();
 	}
-    public static void analyzeExcelFile(String fileName){
+    public Map<String, TableI> analyzeExcel(){
+        for (int j = 0; j < 13; j++) {
+            HSSFCell cell = sheet.getRow(0).getCell(j);
+            switch (cell.getCellType()) {
+            	case Cell.CELL_TYPE_NUMERIC:
+            		System.out.print("Error");
+            		break;
+            	case Cell.CELL_TYPE_STRING:
+            	case Cell.CELL_TYPE_FORMULA:
+            		scanner.analyzeAttributeName(cell.getStringCellValue(), "varchar(255)");
+            		System.out.println(cell.getStringCellValue() + " attribute has been added");
+            		break;
+            }
+        }
+                System.out.print("\n");
+         try {
+			this. fis.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+         return scanner.getTables();
+    }
+    public void writeCreateQuery(String dbName, Map<String, TableI> tables) {
+    	this.writer.writeCreateCommand(tables);
+    }
+    
+    /*   public static void analyzeExcelFile(String fileName){
         try{
-            FileInputStream fis = new FileInputStream(fileName);
-            HSSFWorkbook workbook = new HSSFWorkbook(fis);
-            HSSFSheet sheet = workbook.getSheetAt(0);
+           
             String line= "";
             for (int i = 1; i< 23; i++) {
                 for (int j = 0; j < Excel.queryCell.length; j++) {
@@ -97,7 +144,7 @@ public class Excel {
         }
 
 
-    }
+    }*/
     public static void writeDataToExcelFile(String fileName) {
         try {
 
