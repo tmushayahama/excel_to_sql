@@ -26,12 +26,14 @@ public class Excel {
     private HSSFSheet sheet; //i.e first worksheet hardcoded
 	private ScannerI scanner;
 	private WriterI writer;
+	AnalyzerI analyzer;
     
 	
 	public static void main(String[] args) {
     	Excel excel = new Excel(args[0]);
-    	Map<String, TableI> tables = excel.analyzeExcel();
-    	excel.writeCreateQuery("Main", tables);
+    	DBDef.initializeDB();
+    	excel.createDB();
+    	excel.writer.writeCreateCommand();
     }
     public Excel (String fileName) {
 		try {
@@ -40,6 +42,7 @@ public class Excel {
 			this.sheet = workbook.getSheetAt(0);
 			scanner = new Scanner();
 			writer = new Writer();
+			analyzer = new Analyzer();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -88,7 +91,8 @@ public class Excel {
 		metaWriter.write(line);
 		metaWriter.newLine();
 	}
-    public Map<String, TableI> analyzeExcel(){
+    public void createDB(){
+    	DBDef.addTable("Genome", "Main", new AttributeData("id", true));
         for (int j = 0; j < 13; j++) {
             HSSFCell cell = sheet.getRow(0).getCell(j);
             switch (cell.getCellType()) {
@@ -97,22 +101,20 @@ public class Excel {
             		break;
             	case Cell.CELL_TYPE_STRING:
             	case Cell.CELL_TYPE_FORMULA:
-            		scanner.analyzeAttributeName(cell.getStringCellValue(), "varchar(255)");
+            	//	scanner.analyzeAttributeName(cell.getStringCellValue(), );
+            		String attrName = analyzer.rename(cell.getStringCellValue());
+            		DBDef.addTable("Genome", "Main", new AttributeData(attrName, "varchar(255)"));
             		System.out.println(cell.getStringCellValue() + " attribute has been added");
             		break;
             }
         }
-                System.out.print("\n");
+        System.out.print("\n");
          try {
 			this. fis.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-         return scanner.getTables();
-    }
-    public void writeCreateQuery(String dbName, Map<String, TableI> tables) {
-    	this.writer.writeCreateCommand(tables);
     }
     
     /*   public static void analyzeExcelFile(String fileName){

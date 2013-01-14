@@ -19,4 +19,10 @@ public class AttributeData {
 		this.variableType = variableType;
 		this.isPrimaryKey = primaryKey;
 	}
+	public AttributeData(String attrName, Boolean autoIncrement) {
+		this.attrName = attrName;
+		this.variableType = "int";
+		this.isPrimaryKey = true;
+		this.isAutoIncrement = autoIncrement;
+	}
 }

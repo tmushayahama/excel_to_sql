@@ -11,8 +11,9 @@ public class Writer implements WriterI{
 
 	}
 	@Override
-	public void writeCreateCommand(Map<String, TableI> tables) {
+	public void writeCreateCommand() {
 		String createQuery = "";
+		Map<String, TableI> tables =  DBDef.getTables();
 		for(String s: tables.keySet()) {
 			createQuery += "create " +  s + "(\n";
 			for (int i = 0; i < tables.get(s).getSize(); i++) {
@@ -31,6 +32,7 @@ public class Writer implements WriterI{
 			createQuery += "\n) \n\n";
 		}
 		System.out.println(createQuery);
+		
 	}
 
 }

@@ -1,12 +1,10 @@
-import java.util.HashMap;
-import java.util.Set;
-
-public class Analyzer {
+public class Analyzer implements AnalyzerI {
 	public Analyzer() {
 	}
-	
-	public String create(String dbName, String dbTable, HashMap<String, String> columnNames) {
-		
-		return null;
+
+	@Override
+	public String rename(String attrName) {
+		return attrName;
 	}
+	
 }
