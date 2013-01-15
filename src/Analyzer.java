@@ -4,7 +4,11 @@ public class Analyzer implements AnalyzerI {
 
 	@Override
 	public String rename(String attrName) {
-		return attrName;
+		String result = attrName.trim();
+		while (result.contains(" ")) {
+			result = result.replace(" ", "_"); //will change the hard coding
+		}
+		return result.toLowerCase();
 	}
 	
 }

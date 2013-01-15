@@ -26,10 +26,15 @@ public class Writer implements WriterI{
 					//write all the primary key and foreign keys
 			for (int i = 0; i < tables.get(s).getSize(); i++) {
 				if (tables.get(s).isPrimaryKey(i)) {
-					createQuery += "primary key (" + tables.get(s).getAttributeName(i)+ ")";
+					createQuery += "\tprimary key (" + tables.get(s).getAttributeName(i)+ ")";
+				}
+				//we assume that there is at least one primary key so that a comma
+				if (tables.get(s).hasRef(i)) {
+					createQuery += ",\n";
+					createQuery += "\tforeign key(" + tables.get(s).getAttributeName(i)+ ") references " + tables.get(s).getRef(i);
 				}
 			}
-			createQuery += "\n) \n\n";
+			createQuery += "\n); \n";
 		}
 		System.out.println(createQuery);
 		

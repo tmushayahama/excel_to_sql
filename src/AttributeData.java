@@ -25,4 +25,21 @@ public class AttributeData {
 		this.isPrimaryKey = true;
 		this.isAutoIncrement = autoIncrement;
 	}
+	public AttributeData(String attrName, String variableType, String ref) {
+		this.attrName = attrName;
+		this.variableType = variableType;
+		this.ref = ref;
+	}
+	public Boolean hasRef() {
+		if (this.ref == null) {
+			return false;
+		} else {
+			return true;
+		}
+	}
 }
+
+
+
+
+

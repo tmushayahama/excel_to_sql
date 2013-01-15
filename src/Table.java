@@ -41,13 +41,16 @@ public class Table implements TableI {
 		return table.get(i).variableType;
 	}
 	@Override
-	public void addTable(TableI table) {
-		
-		
-	}
-	@Override
 	public boolean isPrimaryKey(int index) {
 		return table.get(index).isPrimaryKey;
+	}
+	@Override
+	public String getRef(int index) {
+		return table.get(index).ref;
+	}
+	@Override
+	public boolean hasRef(int index) {
+		return table.get(index).hasRef();
 	}
 
 }

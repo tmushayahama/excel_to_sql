@@ -29,12 +29,7 @@ public class Excel {
 	AnalyzerI analyzer;
     
 	
-	public static void main(String[] args) {
-    	Excel excel = new Excel(args[0]);
-    	DBDef.initializeDB();
-    	excel.createDB();
-    	excel.writer.writeCreateCommand();
-    }
+	
     public Excel (String fileName) {
 		try {
 			this.fis = new FileInputStream(fileName);
@@ -91,9 +86,11 @@ public class Excel {
 		metaWriter.write(line);
 		metaWriter.newLine();
 	}
+  
+    
     public void createDB(){
-    	DBDef.addTable("Genome", "Main", new AttributeData("id", true));
-        for (int j = 0; j < 13; j++) {
+    	DBDef.addTable("Genome", "main", new AttributeData("id", true));
+        for (int j = 0; j < 10; j++) {
             HSSFCell cell = sheet.getRow(0).getCell(j);
             switch (cell.getCellType()) {
             	case Cell.CELL_TYPE_NUMERIC:
@@ -103,8 +100,16 @@ public class Excel {
             	case Cell.CELL_TYPE_FORMULA:
             	//	scanner.analyzeAttributeName(cell.getStringCellValue(), );
             		String attrName = analyzer.rename(cell.getStringCellValue());
-            		DBDef.addTable("Genome", "Main", new AttributeData(attrName, "varchar(255)"));
-            		System.out.println(cell.getStringCellValue() + " attribute has been added");
+            		if (attrName.endsWith("(s)")) {
+            			System.out.println("One to many relationship identified... " + cell.getStringCellValue() + "\n");
+            			attrName = attrName.replace("(s)", "");
+            			DBDef.addTable("Genome", attrName, new AttributeData("id", true));
+            			DBDef.addTable("Genome", attrName, new AttributeData(attrName+"_id", "int", "main.id"));
+            			DBDef.addTable("Genome", attrName, new AttributeData(attrName, "varchar(255)"));
+            		} else {
+            			DBDef.addTable("Genome", "main", new AttributeData(attrName, "varchar(255)"));
+            		//System.out.println(cell.getStringCellValue() + " attribute has been added");
+            		}
             		break;
             }
         }
@@ -173,5 +178,11 @@ public class Excel {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    public static void main(String[] args) {
+    	Excel excel = new Excel(args[0]);
+    	DBDef.initializeDB();
+    	excel.createDB();
+    	excel.writer.writeCreateCommand();
     }
 }

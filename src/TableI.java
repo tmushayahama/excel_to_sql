@@ -7,6 +7,7 @@ public interface TableI {
 	boolean isAutoIncrement(int index);
 	String getVariableType(int index);
 	boolean isPrimaryKey(int index);
-	void addTable(TableI table);
+	String getRef(int i);
+	boolean hasRef(int i);
 	
 }
