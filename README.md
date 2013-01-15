@@ -9,5 +9,6 @@ whole excel spreadsheet looking for things like:
 3.	If we see repeating values, we split the table.
 4.	More to come
 
-1 
+Example spreadsheet provided
+To Run Excel t1.xls
 ==============
