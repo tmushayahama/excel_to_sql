@@ -1,17 +1,38 @@
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 
 public class Writer implements WriterI{
+	private File mainFile;
+	private BufferedWriter metaWriter;
 	public Writer() {
-		
+		this.createFiles();
+		try {
+			metaWriter = new BufferedWriter(new FileWriter(this.mainFile));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	} 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+	
+   /**Write one line to the files created.
+    * 
+    * @param line The line being added.
+    * @param file 
+    * @param metaWriter
+    * @throws IOException
+    */
+	@Override
+	public final void writeToFile(String line, BufferedWriter metaWriter) throws IOException {
+		metaWriter.write(line);
+		metaWriter.newLine();
 	}
 	@Override
-	public void writeCreateCommand() {
+	public final void writeCreateCommand() {
 		String createQuery = "";
 		Map<String, TableI> tables =  DBDef.getTables();
 		for(String s: tables.keySet()) {
@@ -37,7 +58,32 @@ public class Writer implements WriterI{
 			createQuery += "\n); \n";
 		}
 		System.out.println(createQuery);
-		
+		try {
+			this.writeToFile(createQuery, metaWriter);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
-
+	@Override
+	public final void close() {
+		try {
+			this.metaWriter.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	private void createFiles() {
+		this.mainFile 	= new File("main.sql");
+		if (mainFile.exists()) {
+			mainFile.delete();
+		}
+		try {
+			mainFile.createNewFile();
+		} catch (IOException e) {
+			System.out.println("Error: Could not create file.");
+			System.exit(0);
+		}
+	}
 }

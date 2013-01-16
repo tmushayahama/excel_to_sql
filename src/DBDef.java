@@ -1,6 +1,7 @@
 import java.util.HashMap;
 import java.util.Map;
 public class DBDef {
+	public static String DBName;
 	private static Map<String, TableI> tables;
 	/** Constructor which initialize the table list.
 	 * 

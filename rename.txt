@@ -1,0 +1,9 @@
+gene=Gene
+pmid=PMID
+family_member(s)=Family Member(s)
+species=Species
+experimental_tissue(s)=Experimental Tissue(s)
+experiment=Experiment
+replicates=Replicates
+control=Control
+quality_fold_change=Quality Fold Change
